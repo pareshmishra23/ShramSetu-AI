@@ -213,6 +213,197 @@ class ShramSetuAPITester:
         print(f"   Validation tests passed: {validation_passed}/{len(invalid_cases)}")
         return validation_passed == len(invalid_cases)
 
+    # ==================== JOB TESTING METHODS ====================
+    
+    def test_create_job(self, job_data: Dict[str, Any], should_succeed: bool = True):
+        """Test job creation"""
+        expected_status = 201 if should_succeed else 422
+        test_name = f"Create Job - {job_data.get('title', 'Unknown')}"
+        
+        success, response, status_code = self.run_test(
+            test_name,
+            "POST",
+            "jobs/create",
+            expected_status,
+            job_data
+        )
+        
+        if success and should_succeed:
+            job_id = response.get("job_id")
+            if job_id:
+                self.created_jobs.append(job_id)
+                print(f"   ✓ Job created with ID: {job_id}")
+                return job_id
+        
+        return None if should_succeed else success
+
+    def test_get_all_jobs(self):
+        """Test getting all jobs"""
+        success, response, _ = self.run_test(
+            "Get All Jobs",
+            "GET",
+            "jobs/",
+            200
+        )
+        
+        if success:
+            jobs_count = len(response) if isinstance(response, list) else 0
+            print(f"   ✓ Retrieved {jobs_count} jobs")
+        
+        return success, response
+
+    def test_get_job_by_id(self, job_id: str):
+        """Test getting a specific job by ID"""
+        success, response, _ = self.run_test(
+            f"Get Job by ID - {job_id}",
+            "GET",
+            f"jobs/{job_id}",
+            200
+        )
+        
+        if success and response.get("job_id") == job_id:
+            print(f"   ✓ Retrieved job: {response.get('title')}")
+        
+        return success, response
+
+    def test_assign_laborers_to_job(self, job_id: str, phone_numbers: list, should_succeed: bool = True):
+        """Test assigning laborers to a job"""
+        expected_status = 200 if should_succeed else 400
+        assignment_data = {"phone_numbers": phone_numbers}
+        
+        success, response, status_code = self.run_test(
+            f"Assign Laborers to Job - {job_id}",
+            "PATCH",
+            f"jobs/{job_id}/assign",
+            expected_status,
+            assignment_data
+        )
+        
+        if success and should_succeed:
+            assigned_count = len(response.get("assigned_laborers", []))
+            print(f"   ✓ Assigned {assigned_count} laborers to job")
+        
+        return success, response
+
+    def test_update_job(self, job_id: str, update_data: Dict[str, Any]):
+        """Test updating job information"""
+        success, response, _ = self.run_test(
+            f"Update Job - {job_id}",
+            "PUT",
+            f"jobs/{job_id}",
+            200,
+            update_data
+        )
+        
+        if success:
+            print(f"   ✓ Updated job successfully")
+        
+        return success, response
+
+    def test_delete_job(self, job_id: str):
+        """Test deleting a job"""
+        success, response, _ = self.run_test(
+            f"Delete Job - {job_id}",
+            "DELETE",
+            f"jobs/{job_id}",
+            200
+        )
+        
+        if success:
+            print(f"   ✓ Deleted job successfully")
+            # Remove from tracking list
+            if job_id in self.created_jobs:
+                self.created_jobs.remove(job_id)
+        
+        return success
+
+    def test_get_jobs_by_skill(self, skill_name: str):
+        """Test getting jobs by skill"""
+        success, response, _ = self.run_test(
+            f"Get Jobs by Skill - {skill_name}",
+            "GET",
+            f"jobs/skill/{skill_name}",
+            200
+        )
+        
+        if success:
+            jobs_count = len(response) if isinstance(response, list) else 0
+            print(f"   ✓ Retrieved {jobs_count} jobs for skill '{skill_name}'")
+        
+        return success, response
+
+    def test_job_validation(self):
+        """Test job creation validation"""
+        print("\n🧪 Testing Job Data Validation...")
+        
+        invalid_job_cases = [
+            {
+                "name": "Missing Title",
+                "data": {
+                    "description": "Test job description",
+                    "skill_required": "mason",
+                    "location": "Delhi",
+                    "date": "2025-07-15",
+                    "time": "08:00",
+                    "contact_number": "+919876543210"
+                },
+                "expected_error": "title"
+            },
+            {
+                "name": "Invalid Contact Number",
+                "data": {
+                    "title": "Test Job",
+                    "description": "Test job description",
+                    "skill_required": "mason",
+                    "location": "Delhi",
+                    "date": "2025-07-15",
+                    "time": "08:00",
+                    "contact_number": "invalid-phone"
+                },
+                "expected_error": "contact_number"
+            },
+            {
+                "name": "Empty Description",
+                "data": {
+                    "title": "Test Job",
+                    "description": "",
+                    "skill_required": "mason",
+                    "location": "Delhi",
+                    "date": "2025-07-15",
+                    "time": "08:00",
+                    "contact_number": "+919876543210"
+                },
+                "expected_error": "description"
+            },
+            {
+                "name": "Missing Date",
+                "data": {
+                    "title": "Test Job",
+                    "description": "Test job description",
+                    "skill_required": "mason",
+                    "location": "Delhi",
+                    "time": "08:00",
+                    "contact_number": "+919876543210"
+                },
+                "expected_error": "date"
+            }
+        ]
+        
+        validation_passed = 0
+        for case in invalid_job_cases:
+            success, response, status_code = self.run_test(
+                f"Job Validation - {case['name']}",
+                "POST",
+                "jobs/create",
+                422,  # FastAPI validation error
+                case["data"]
+            )
+            if success:
+                validation_passed += 1
+        
+        print(f"   Job validation tests passed: {validation_passed}/{len(invalid_job_cases)}")
+        return validation_passed == len(invalid_job_cases)
+
     def cleanup_created_laborers(self):
         """Clean up any laborers created during testing"""
         print(f"\n🧹 Cleaning up {len(self.created_laborers)} created laborers...")
