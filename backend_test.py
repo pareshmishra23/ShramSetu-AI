@@ -285,6 +285,14 @@ class ShramSetuAPITester:
             404
         )
 
+        # Test 8.5: Test API documentation
+        success, response, _ = self.run_test(
+            "API Documentation",
+            "GET",
+            "../docs",  # Go up one level from /api to get /docs
+            200
+        )
+
         # Test 9: Register another laborer for more comprehensive testing
         second_laborer = {
             "name": "Shyam Singh",
