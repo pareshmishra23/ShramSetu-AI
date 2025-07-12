@@ -6,7 +6,7 @@ import uuid
 class Laborer(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str = Field(..., min_length=1, max_length=100)
-    phone: str = Field(..., regex=r'^\+?[1-9]\d{1,14}$')
+    phone: str = Field(..., pattern=r'^\+?[1-9]\d{1,14}$')
     skill: str = Field(..., min_length=1, max_length=50)
     location: str = Field(..., min_length=1, max_length=100)
     language: str = Field(..., min_length=1, max_length=30)
@@ -29,7 +29,7 @@ class Laborer(BaseModel):
 
 class LaborerCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
-    phone: str = Field(..., regex=r'^\+?[1-9]\d{1,14}$')
+    phone: str = Field(..., pattern=r'^\+?[1-9]\d{1,14}$')
     skill: str = Field(..., min_length=1, max_length=50)
     location: str = Field(..., min_length=1, max_length=100)
     language: str = Field(..., min_length=1, max_length=30)
@@ -47,7 +47,7 @@ class LaborerCreate(BaseModel):
 
 class LaborerUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=100)
-    phone: Optional[str] = Field(None, regex=r'^\+?[1-9]\d{1,14}$')
+    phone: Optional[str] = Field(None, pattern=r'^\+?[1-9]\d{1,14}$')
     skill: Optional[str] = Field(None, min_length=1, max_length=50)
     location: Optional[str] = Field(None, min_length=1, max_length=100)
     language: Optional[str] = Field(None, min_length=1, max_length=30)
