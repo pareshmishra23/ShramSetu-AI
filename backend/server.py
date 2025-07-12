@@ -23,6 +23,7 @@ init_db()
 
 # Include routes
 api_router.include_router(register_router, prefix="/laborers", tags=["laborers"])
+api_router.include_router(jobs_router, prefix="/jobs", tags=["jobs"])
 
 # Basic health check
 @api_router.get("/")
