@@ -410,6 +410,12 @@ class ShramSetuAPITester:
         for laborer_id in self.created_laborers.copy():
             self.test_delete_laborer(laborer_id)
 
+    def cleanup_created_jobs(self):
+        """Clean up any jobs created during testing"""
+        print(f"\n🧹 Cleaning up {len(self.created_jobs)} created jobs...")
+        for job_id in self.created_jobs.copy():
+            self.test_delete_job(job_id)
+
     def run_comprehensive_tests(self):
         """Run all tests in sequence"""
         print("🚀 Starting ShramSetu API Comprehensive Tests")
