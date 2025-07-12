@@ -638,10 +638,12 @@ def main():
         
     except KeyboardInterrupt:
         print("\n⏹️  Tests interrupted by user")
+        tester.cleanup_created_jobs()
         tester.cleanup_created_laborers()
         return 1
     except Exception as e:
         print(f"\n💥 Unexpected error: {str(e)}")
+        tester.cleanup_created_jobs()
         tester.cleanup_created_laborers()
         return 1
 
