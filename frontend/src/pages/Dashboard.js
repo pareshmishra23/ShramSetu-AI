@@ -166,23 +166,33 @@ const Dashboard = () => {
             <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
           </div>
           <div className="space-y-3">
-            <button className="w-full btn-primary text-left flex items-center">
+            <button 
+              onClick={handleAddLaborer}
+              className="w-full btn-primary text-left flex items-center"
+            >
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               Add New Laborer
             </button>
-            <button className="w-full btn-secondary text-left flex items-center">
+            <button 
+              onClick={handleCreateJob}
+              className="w-full btn-secondary text-left flex items-center"
+            >
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               Create New Job
             </button>
-            <button className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-left flex items-center">
+            <button 
+              onClick={handleRefreshData}
+              className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-left flex items-center"
+              disabled={loading}
+            >
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-              Refresh Data
+              {loading ? 'Refreshing...' : 'Refresh Data'}
             </button>
           </div>
         </div>
