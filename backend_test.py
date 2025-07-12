@@ -17,6 +17,7 @@ class ShramSetuAPITester:
         self.tests_run = 0
         self.tests_passed = 0
         self.created_laborers = []  # Track created laborers for cleanup
+        self.created_jobs = []  # Track created jobs for cleanup
 
     def log_test(self, name: str, success: bool, details: str = ""):
         """Log test results"""
