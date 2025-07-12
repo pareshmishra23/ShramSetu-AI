@@ -172,7 +172,7 @@ class ShramSetuAPITester:
         """Test various invalid data scenarios"""
         print("\n🧪 Testing Data Validation...")
         
-        # Test missing required fields
+        # Test missing required fields (FastAPI returns 422 for validation errors)
         invalid_cases = [
             {
                 "name": "Missing Phone",
@@ -198,7 +198,14 @@ class ShramSetuAPITester:
         
         validation_passed = 0
         for case in invalid_cases:
-            success = self.test_register_laborer(case["data"], should_succeed=False)
+            # FastAPI returns 422 for validation errors, not 400
+            success, response, status_code = self.run_test(
+                f"Validation - {case['name']}",
+                "POST",
+                "laborers/register",
+                422,  # Changed from 400 to 422
+                case["data"]
+            )
             if success:
                 validation_passed += 1
         
