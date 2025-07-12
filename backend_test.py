@@ -428,6 +428,10 @@ class ShramSetuAPITester:
             print("❌ Health check failed - stopping tests")
             return False
 
+        # ==================== LABORER TESTS ====================
+        print("\n📋 TESTING LABORER MANAGEMENT")
+        print("=" * 40)
+
         # Test 2: Register valid laborer (using unique phone number)
         timestamp = datetime.now().strftime("%H%M%S")
         valid_laborer = {
@@ -483,15 +487,7 @@ class ShramSetuAPITester:
             404
         )
 
-        # Test 8.5: Test API documentation
-        success, response, _ = self.run_test(
-            "API Documentation",
-            "GET",
-            "../docs",  # Go up one level from /api to get /docs
-            200
-        )
-
-        # Test 9: Register another laborer for more comprehensive testing
+        # Test 9: Register another laborer for job assignment testing
         second_laborer = {
             "name": "Shyam Singh",
             "phone": f"+91876543{timestamp[-4:]}",  # Another unique phone
@@ -499,14 +495,116 @@ class ShramSetuAPITester:
             "location": "Karol Bagh",
             "language": "punjabi"
         }
-        second_id = self.test_register_laborer(second_laborer)
+        second_laborer_id = self.test_register_laborer(second_laborer)
 
-        # Test 10: Final get all laborers to verify count
+        # Make laborers available for job assignment
+        self.test_update_laborer(laborer_id, {"available": True})
+        self.test_update_laborer(second_laborer_id, {"available": True})
+
+        # ==================== JOB TESTS ====================
+        print("\n💼 TESTING JOB MANAGEMENT")
+        print("=" * 40)
+
+        # Test 10: Create valid job
+        valid_job = {
+            "title": "House Construction - Mason Required",
+            "description": "Need an experienced mason for house construction work. 2-day project.",
+            "skill_required": "mason",
+            "location": "Tilak Nagar, Delhi",
+            "date": "2025-07-15",
+            "time": "08:00",
+            "contact_number": "+919876543210"
+        }
+        
+        job_id = self.test_create_job(valid_job)
+        if not job_id:
+            print("❌ Failed to create valid job - stopping job tests")
+        else:
+            # Test 11: Get all jobs
+            success, all_jobs = self.test_get_all_jobs()
+            if not success:
+                print("❌ Failed to get all jobs")
+
+            # Test 12: Get specific job by ID
+            success, job_data = self.test_get_job_by_id(job_id)
+            if not success:
+                print("❌ Failed to get job by ID")
+
+            # Test 13: Assign laborers to job (valid phone numbers)
+            laborer_phones = [valid_laborer["phone"], second_laborer["phone"]]
+            success, assignment_response = self.test_assign_laborers_to_job(job_id, laborer_phones)
+            if not success:
+                print("❌ Failed to assign laborers to job")
+
+            # Test 14: Try to assign non-existent laborer (should fail)
+            invalid_phones = ["+919999999999"]
+            success, _ = self.test_assign_laborers_to_job(job_id, invalid_phones, should_succeed=False)
+
+            # Test 15: Try to assign already assigned laborer (should fail)
+            success, _ = self.test_assign_laborers_to_job(job_id, [valid_laborer["phone"]], should_succeed=False)
+
+            # Test 16: Update job information
+            job_update_data = {
+                "title": "Updated House Construction Job",
+                "status": "completed"
+            }
+            success, updated_job = self.test_update_job(job_id, job_update_data)
+            if not success:
+                print("❌ Failed to update job")
+
+            # Test 17: Get jobs by skill
+            success, mason_jobs = self.test_get_jobs_by_skill("mason")
+            if not success:
+                print("❌ Failed to get jobs by skill")
+
+            # Test 18: Create another job for skill filtering
+            carpenter_job = {
+                "title": "Furniture Making - Carpenter Required",
+                "description": "Need a skilled carpenter for custom furniture making.",
+                "skill_required": "carpenter",
+                "location": "Karol Bagh, Delhi",
+                "date": "2025-07-20",
+                "time": "09:00",
+                "contact_number": "+919876543211"
+            }
+            carpenter_job_id = self.test_create_job(carpenter_job)
+
+            # Test 19: Get jobs by different skill
+            success, carpenter_jobs = self.test_get_jobs_by_skill("carpenter")
+            if not success:
+                print("❌ Failed to get carpenter jobs by skill")
+
+        # Test 20: Job validation tests
+        self.test_job_validation()
+
+        # Test 21: Test non-existent job
+        self.run_test(
+            "Get Non-existent Job",
+            "GET",
+            "jobs/non-existent-id",
+            404
+        )
+
+        # Test 22: API documentation
+        success, response, _ = self.run_test(
+            "API Documentation",
+            "GET",
+            "../docs",  # Go up one level from /api to get /docs
+            200
+        )
+
+        # Test 23: Final get all jobs to verify count
+        success, final_jobs = self.test_get_all_jobs()
+        if success:
+            print(f"   Final job count: {len(final_jobs)}")
+
+        # Test 24: Final get all laborers to verify count
         success, final_laborers = self.test_get_all_laborers()
         if success:
             print(f"   Final laborer count: {len(final_laborers)}")
 
         # Cleanup
+        self.cleanup_created_jobs()
         self.cleanup_created_laborers()
 
         return True
