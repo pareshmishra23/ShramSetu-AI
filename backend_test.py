@@ -223,10 +223,11 @@ class ShramSetuAPITester:
             print("❌ Health check failed - stopping tests")
             return False
 
-        # Test 2: Register valid laborer
+        # Test 2: Register valid laborer (using unique phone number)
+        timestamp = datetime.now().strftime("%H%M%S")
         valid_laborer = {
             "name": "Raju Kumar",
-            "phone": "+919876543210",
+            "phone": f"+91987654{timestamp[-4:]}",  # Unique phone number
             "skill": "mason",
             "location": "Tilak Nagar",
             "language": "hindi"
