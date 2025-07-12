@@ -281,7 +281,7 @@ class ShramSetuAPITester:
         # Test 9: Register another laborer for more comprehensive testing
         second_laborer = {
             "name": "Shyam Singh",
-            "phone": "+918765432109",
+            "phone": f"+91876543{timestamp[-4:]}",  # Another unique phone
             "skill": "carpenter",
             "location": "Karol Bagh",
             "language": "punjabi"
