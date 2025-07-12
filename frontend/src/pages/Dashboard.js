@@ -6,6 +6,7 @@ const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDashboardData();
@@ -23,6 +24,18 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddLaborer = () => {
+    navigate('/laborers');
+  };
+
+  const handleCreateJob = () => {
+    navigate('/jobs');
+  };
+
+  const handleRefreshData = () => {
+    fetchDashboardData();
   };
 
   const StatCard = ({ title, value, icon, color = 'blue' }) => (
