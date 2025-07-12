@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 ShramSetu Backend API Testing Script
-Tests all CRUD operations for the laborer management system
+Tests all CRUD operations for the laborer management system and job management system
 """
 
 import requests
