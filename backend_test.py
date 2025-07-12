@@ -238,10 +238,10 @@ class ShramSetuAPITester:
             print("❌ Failed to register valid laborer - stopping tests")
             return False
 
-        # Test 3: Try to register duplicate phone (should fail)
+        # Test 3: Try to register duplicate phone (should fail) - using existing phone
         duplicate_laborer = {
             "name": "Another Person",
-            "phone": "+919876543210",  # Same phone
+            "phone": "+919876543210",  # This phone already exists in DB
             "skill": "carpenter",
             "location": "CP",
             "language": "english"
