@@ -6,6 +6,7 @@ import os
 import logging
 from database import init_db
 from routes.register import router as register_router
+from routes.jobs import router as jobs_router
 
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
